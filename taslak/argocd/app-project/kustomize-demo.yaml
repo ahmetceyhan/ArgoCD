@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  namespace: argocd
+  name: nginx-kustomize-project
+spec:
+  description: fimple project
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+    - name: in-cluster
+      namespace: '*'
+      server: https://kubernetes.default.svc
+    - name: in-cluster
+      namespace: ''
+      server: https://kubernetes.default.svc
+  orphanedResources:
+    warn: true
+  sourceRepos:
+    - https://github.com/ahmetceyhan/ArgoCD.git
+  roles:
+    - groups:
+        - Devops Ekibi
+      name: DevopsEkibi
+      policies:
+        - >-
+          p, proj:kustomize-dem-project:DevopsEkibi, applications, *,
+          nginx-kustomize-project/*, allow
+        - >-
+          p, proj:nginx-kustomize:DevopsEkibi, applications, update,
+          nginx-kustomize-project/*, deny

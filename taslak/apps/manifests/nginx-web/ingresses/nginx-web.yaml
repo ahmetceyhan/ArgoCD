@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-web-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: >-
+      more_set_headers "X-Frame-Options: Deny";more_set_headers
+      "X-Xss-Protection: 1; mode=block";more_set_headers "X-Powered-By: Remove";
+      more_set_headers "Content-Security-Policy: default-src
+      https://*.mywebsite.com.tr wss://*.mywebsite.com.tr
+      blob: data: 'unsafe-eval'; font-src 'self'
+      https://*.mywebsite.com.tr data:; style-src
+      'self' https://*.mywebsite.com.tr
+      'unsafe-inline';"; more_set_headers "X-Content-Type-Options: nosniff";
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: nginx.mywebsite.com.tr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-proxy
+            port:
+              number: 80
+  tls:
+    - hosts:
+        - nginx.mywebsite.com.tr
+      secretName: mywebsite.com.tr

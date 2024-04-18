@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  namespace: argocd
+  name: hello-world-helm-project
+spec:
+  description: vault helm project
+  destinations:
+    - name: in-cluster
+      namespace: 'my-nginx-helm'
+      server: https://kubernetes.default.svc
+  orphanedResources:
+    warn: true
+  sourceRepos:
+    - https://github.com/ahmetceyhan/ArgoCD.git
+# Necessary definitions for LDAP integration.
+# Ldap user groups can be given full or limited permissions with argocd project name.
+# https://asrgocd.mywebsite.com.tr/settings/projects/nginx-web/Roles?tab=roles --> ADD ROLE
+  roles:
+    - groups:
+        - Devops Ekibi # LDAP user group  
+      name: DevopsEkibi # LDAP user group name for ArgoCD 
+      policies:
+        # full permissions
+        - >-
+          p, proj:hello-world-helm-project:DevopsEkibi, applications, *,
+          hello-world-helm-project/*, allow                               
+        # disable edit permissions
+        - >-
+          p, proj:hello-world-helm-project:DevopsEkibi, applications, update,
+          hello-world-helm-project/*, deny

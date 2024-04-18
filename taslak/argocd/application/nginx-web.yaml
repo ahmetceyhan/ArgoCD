@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: nginx-web
+spec:
+  destination:
+    name: ''
+    namespace: 'my-nginx-web'
+    server: 'https://kubernetes.default.svc'
+  ignoreDifferences:
+# The replication count was ensured not to be synchronized for HPA.  
+    - group: apps
+      jsonPointers:
+        - /spec/replicas
+      kind: Deployment
+      namespace: my-nginx-web
+  source:
+    path: ./taslak/apps/manifests/nginx-web
+    repoURL: >-
+      https://github.com/ahmetceyhan/ArgoCD.git
+    targetRevision: HEAD
+# Subdirectories are added to ArgoCD along with main directory.
+    directory:
+      recurse: true
+  project: nginx-web-project  
+# RespectIgnoreDifferences was enabled because there are fields to be ignored during sync. Because of, The replication count was ensured not to be synchronized for HPA.
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true

@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-kustomize
+  namespace: argocd
+spec:
+  destination:
+    name: ""
+    namespace: "" #  We used empty to encompass different namespaces for all Kustomize manifests and for objects like ClusterRoleBinding without a namespace.
+    server: "https://kubernetes.default.svc"
+  source:
+    path: preprod/apps/kustomize/nginx/dev
+    repoURL: >-
+      https://github.com/ahmetceyhan/ArgoCD.git
+    targetRevision: HEAD
+  sources: []
+  project: nginx-kustomize-project

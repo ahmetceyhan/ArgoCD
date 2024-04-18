@@ -1,0 +1,45 @@
+apiVersion: v1
+data:
+# Disable admin authentication.
+  admin.enabled: 'false'
+# Adding custom labels instead of the default ArgoCD 'app.kubernetes.io/instance' label.
+  application.instanceLabelKey: argocd.argoproj.io/customargocdlabel
+# ArgoCD uses Dex server for LDAPS integration. Dex server configuration varies depending on LDAPS(via active directory) parameters. 
+# For detailed information: https://dexidp.io/docs/connectors/ldap/
+  dex.config: |-
+    logger:
+      level: debug
+    connectors:
+    - type: ldap
+      name: LDAPS
+      id: ldaps
+      config:
+        host: "ldaps.mywebsite.local:636"
+        insecureNoSSL: false
+        insecureSkipVerify: true
+        bindDN: "$dex.ldap.bindDN"
+        bindPW: "$dex.ldap.bindPW"
+        usernamePrompt: Username
+        userSearch:
+          baseDN: "OU=PAM-Login,OU=Single Connect,OU=PAM,OU=MyWebSite,DC=mywebsite,DC=local"
+          filter: ""
+          username: sAMAccountName
+          idAttr: DN
+          nameAttr: name
+          emailAttr: DN
+        groupSearch:
+          baseDN: "DC=mywebsite,DC=local"
+          filter: ""
+          userAttr: sAMAccountName
+          groupAttr: sAMAccountName
+          nameAttr: name
+          userMatchers:
+           - userAttr: DN
+             groupAttr: member             
+  exec.enabled: 'false' # "It disables the execute permission for the pod."
+  server.rbac.log.enforce.enable: 'false'
+  url: https://argocd.mywebsite.com.tr # ArgoCD default url for dex.
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd

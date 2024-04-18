@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: nginx-proxy
+spec:
+  destination:
+    name: ''
+    namespace: 'my-nginx-proxy'
+    server: 'https://kubernetes.default.svc'
+#  ignoreDifferences:
+#    - group: apps
+#      jsonPointers:
+#        - /spec/replicas
+#      kind: Deployment
+#      namespace: my-nginx-proxy
+  source:
+    path: taslak-dmz/apps/manifests/nginx-proxy
+    repoURL: >-
+      https://github.com/ahmetceyhan/ArgoCD.git
+    targetRevision: HEAD
+    directory:
+      recurse: true
+#  project: nginx-proxy
+#  syncPolicy:
+#    syncOptions:
+#      - RespectIgnoreDifferences=true
